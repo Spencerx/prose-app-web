@@ -90,7 +90,7 @@ const $settings = defineStore("settings", {
 
       privacy: {
         report: {
-          analytics: false,
+          tracking: true,
           crashes: true
         }
       },
@@ -204,8 +204,8 @@ const $settings = defineStore("settings", {
       this.setGeneric(this.updates, "channel", value);
     },
 
-    setPrivacyReportAnalytics(value: boolean): void {
-      this.setGeneric(this.privacy.report, "analytics", value);
+    setPrivacyReportTracking(value: boolean): void {
+      this.setGeneric(this.privacy.report, "tracking", value);
     },
 
     setPrivacyReportCrashes(value: boolean): void {

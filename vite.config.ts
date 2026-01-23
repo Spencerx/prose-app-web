@@ -42,6 +42,7 @@ interface Configuration {
 
   overrides?: {
     allowInsecure?: boolean;
+    disableTracking?: boolean;
 
     hostMeta?: {
       [domain: string]: {

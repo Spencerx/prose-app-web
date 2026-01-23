@@ -57,15 +57,14 @@ export default {
 
           fields: [
             {
-              // TODO: this option is unused for now, but will be at some point
-              id: "report-analytics",
+              id: "report-tracking",
               type: FormFieldsetFieldType.Checkbox,
               label: "Reports:",
 
               data: {
                 value: {
-                  inner: Store.$settings.privacy.report.analytics,
-                  change: Store.$settings.setPrivacyReportAnalytics
+                  inner: Store.$settings.privacy.report.tracking,
+                  change: Store.$settings.setPrivacyReportTracking
                 },
 
                 label: "Send anonymous usage analytics"

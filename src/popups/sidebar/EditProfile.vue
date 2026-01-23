@@ -88,6 +88,12 @@ import { ProfileEntry } from "@/store/tables/profile";
 import Broker from "@/broker";
 import { SaveAvatarRequest } from "@/broker/modules/profile";
 
+// PROJECT: UTILITIES
+import {
+  default as UtilitiesTracking,
+  TrackingEventName
+} from "@/utilities/tracking";
+
 // TYPES
 type FormValueString = { inner: string };
 type FormValueBoolean = { inner: boolean };
@@ -418,6 +424,9 @@ export default {
             "Check your profile information"
           );
         }
+
+        // Track profile update
+        UtilitiesTracking.event(TrackingEventName.ProfileUpdated);
       }
     },
 
