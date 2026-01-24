@@ -90,10 +90,16 @@ class UtilitiesTracking {
     this.__eventsNextAllowedSendRegister = {};
   }
 
-  async event(name: TrackingEventName, data?: object): Promise<void> {
+  event(name: TrackingEventName, data?: object): void {
     // User did not opt-out of tracking reports? Dispatch event.
     if (Store.$settings.privacy.report.tracking !== false) {
-      await this.__dispatchEvent(name, data);
+      // Notice: do not await here, since the 'event()' helper wraps \
+      //   asynchronous code in synchronous-looking code. We should never wait \
+      //   for a tracking event dispatch to be complete (it is pointless). We \
+      //   therefore avoid developer mistakes by marking this method as \
+      //   synchronous, since developers will not await it by mistake in \
+      //   caller code.
+      this.__dispatchEvent(name, data);
     } else {
       logger.debug(`Skipped sending tracking event: '${name}' (opted out)`);
     }
