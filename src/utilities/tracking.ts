@@ -163,7 +163,10 @@ class UtilitiesTracking {
 
       logger.info(`Sent tracking event: '${name}'`);
     } catch (error) {
-      logger.warn(`Failed tracking event: '${name}' (ignoring)`, error);
+      logger.info(
+        `Could not track event: '${name}'`,
+        (error as Error)?.message || error
+      );
     }
   }
 
