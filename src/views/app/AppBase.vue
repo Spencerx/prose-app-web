@@ -24,6 +24,14 @@
      ********************************************************************** -->
 
 <script lang="ts">
+// NPM
+import {
+  clearTimeout as clearWorkerTimeout,
+  setTimeout as setWorkerTimeout,
+  clearInterval as clearWorkerInterval,
+  setInterval as setWorkerInterval
+} from "worker-timers";
+
 // PROJECT: ASSEMBLIES
 import AppSidebar from "@/assemblies/app/AppSidebar.vue";
 
@@ -47,9 +55,11 @@ export default {
       // --> STATE <--
 
       heartbeatReportingTickTimeout: null as null | ReturnType<
-        typeof setTimeout
+        typeof setWorkerTimeout
       >,
-      heartbeatReportingInterval: null as null | ReturnType<typeof setInterval>
+      heartbeatReportingInterval: null as null | ReturnType<
+        typeof setWorkerInterval
+      >
     };
   },
 
@@ -69,14 +79,19 @@ export default {
     async tickHeartbeatReporting(initial = false): Promise<void> {
       // Any already scheduled tick? Clear it first
       if (this.heartbeatReportingTickTimeout !== null) {
-        clearTimeout(this.heartbeatReportingTickTimeout);
+        clearWorkerTimeout(this.heartbeatReportingTickTimeout);
       }
 
       // Schedule this immediate tick
-      // Notice: if this is an initial tick, then delay it a little bit, so \
+      // Notice #1: if this is an initial tick, then delay it a little bit, so \
       //   that we are 100% sure the application is alive and not in a \
       //   transient state switch.
-      this.heartbeatReportingTickTimeout = setTimeout(
+      // Notice #2: we also need to use a reliable timeout scheduler here, \
+      //   since this code path can be called from a reliable interval \
+      //   scheduler, whilst the event loop is throttled or paused. We thus \
+      //   want to make sure not to hang there by using a pausable timer to do \
+      //   the final work.
+      this.heartbeatReportingTickTimeout = setWorkerTimeout(
         () => {
           // Track liveness
           UtilitiesTracking.event(TrackingEventName.AppHeartbeat);
@@ -91,7 +106,11 @@ export default {
         // Tick a initial heartbeat reporting
         this.tickHeartbeatReporting(true);
 
-        this.heartbeatReportingInterval = setInterval(() => {
+        // Important: use a reliable interval scheduler, that will definitely \
+        //   fire whenever the event loop is put into background mode due to \
+        //   user inactivity. This uses a Web Worker, which manages interval \
+        //   away from the main thread and therefore is not subject to pauses.
+        this.heartbeatReportingInterval = setWorkerInterval(() => {
           // Tick a heartbeat reporting
           this.tickHeartbeatReporting();
         }, HEARTBEAT_REPORTING_INTERVAL);
@@ -101,14 +120,14 @@ export default {
     unsetupHeartbeatReporting(): void {
       // Clear interval reporter
       if (this.heartbeatReportingInterval !== null) {
-        clearInterval(this.heartbeatReportingInterval);
+        clearWorkerInterval(this.heartbeatReportingInterval);
 
         this.heartbeatReportingInterval = null;
       }
 
       // Clear any scheduled report (from tick)
       if (this.heartbeatReportingTickTimeout !== null) {
-        clearTimeout(this.heartbeatReportingTickTimeout);
+        clearWorkerTimeout(this.heartbeatReportingTickTimeout);
 
         this.heartbeatReportingTickTimeout = null;
       }
