@@ -383,6 +383,9 @@ export default {
       if (this.fetching !== true && this.saving !== true) {
         this.saving = true;
 
+        // Track action
+        UtilitiesTracking.event(TrackingEventName.ProfileUpdate);
+
         // Apply forms in store
         this.formsToStoreApply(this.contentSections.profile.properties.form);
 
@@ -424,9 +427,6 @@ export default {
             "Check your profile information"
           );
         }
-
-        // Track profile update
-        UtilitiesTracking.event(TrackingEventName.ProfileUpdated);
       }
     },
 

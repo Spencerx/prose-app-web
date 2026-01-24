@@ -54,6 +54,10 @@ import {
   context as runtimeContext,
   translucent as runtimeTranslucent
 } from "@/utilities/runtime";
+import {
+  default as UtilitiesTracking,
+  TrackingEventName
+} from "@/utilities/tracking";
 
 // CONSTANTS
 const INTERFACE_WIDTH = 600;
@@ -93,6 +97,11 @@ export default {
         // Attempt to authenticate
         try {
           await Store.$account.login(form.jid, form.password, form.remember);
+
+          // Track action
+          // Important: AFTER login, that way we can properly identify the \
+          //   user in the tracking event.
+          UtilitiesTracking.event(TrackingEventName.AccountSignin);
 
           // Show success alert
           BaseAlert.success("Authenticated", "Welcome back!");

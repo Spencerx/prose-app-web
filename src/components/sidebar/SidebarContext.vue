@@ -157,6 +157,12 @@ import AccountSettings from "@/popups/sidebar/AccountSettings.vue";
 // PROJECT: COMPOSABLES
 import { useEvents } from "@/composables/events";
 
+// PROJECT: UTILITIES
+import {
+  default as UtilitiesTracking,
+  TrackingEventName
+} from "@/utilities/tracking";
+
 // PROJECT: BROKER
 import Broker from "@/broker";
 
@@ -765,6 +771,9 @@ export default {
     async onModalSignOutProceed(
       options: SignOutEventProceedOptions
     ): Promise<void> {
+      // Track action
+      UtilitiesTracking.event(TrackingEventName.AccountSignout);
+
       // Logout from account
       await Store.$account.logout(options.purge);
 

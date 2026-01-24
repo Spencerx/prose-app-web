@@ -35,8 +35,8 @@ export enum TrackingEventName {
   AccountSignin = "account:signin",
   // Account Signout.
   AccountSignout = "account:signout",
-  // Profile Updated.
-  ProfileUpdated = "profile:updated"
+  // Profile Update.
+  ProfileUpdate = "profile:update"
 }
 
 /**************************************************************************
@@ -146,7 +146,8 @@ class UtilitiesTracking {
             "Content-Type": "application/json"
           },
           body: JSON.stringify(eventData),
-          mode: "cors"
+          mode: "cors",
+          credentials: "omit"
         }
       );
 
