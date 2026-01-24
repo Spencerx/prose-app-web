@@ -15,13 +15,13 @@ jobs:
       matrix:
         settings:
           # macOS (Apple Silicon)
-          - runner: macos-14
+          - runner: macos-15
             system: mac
             architecture: aarch64
             target: aarch64-apple-darwin
             bundles: app,dmg
           # macOS (Intel)
-          - runner: macos-13
+          - runner: macos-15-intel
             system: mac
             architecture: x86_64
             target: x86_64-apple-darwin
