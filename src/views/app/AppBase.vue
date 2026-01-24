@@ -27,10 +27,93 @@
 // PROJECT: ASSEMBLIES
 import AppSidebar from "@/assemblies/app/AppSidebar.vue";
 
+// PROJECT: UTILITIES
+import {
+  default as UtilitiesTracking,
+  TrackingEventName
+} from "@/utilities/tracking";
+
+// CONSTANTS
+const HEARTBEAT_REPORTING_TICK_INITIAL_DELAY = 30000; // 30 seconds
+const HEARTBEAT_REPORTING_INTERVAL = 86400000; // 1 day
+
 export default {
   name: "AppBase",
 
-  components: { AppSidebar }
+  components: { AppSidebar },
+
+  data() {
+    return {
+      // --> STATE <--
+
+      heartbeatReportingTickTimeout: null as null | ReturnType<
+        typeof setTimeout
+      >,
+      heartbeatReportingInterval: null as null | ReturnType<typeof setInterval>
+    };
+  },
+
+  mounted() {
+    // Start reporting application heartbeat
+    this.setupHeartbeatReporting();
+  },
+
+  unmounted() {
+    // Stop reporting application heartbeat
+    this.unsetupHeartbeatReporting();
+  },
+
+  methods: {
+    // --> HELPERS <--
+
+    async tickHeartbeatReporting(initial = false): Promise<void> {
+      // Any already scheduled tick? Clear it first
+      if (this.heartbeatReportingTickTimeout !== null) {
+        clearTimeout(this.heartbeatReportingTickTimeout);
+      }
+
+      // Schedule this immediate tick
+      // Notice: if this is an initial tick, then delay it a little bit, so \
+      //   that we are 100% sure the application is alive and not in a \
+      //   transient state switch.
+      this.heartbeatReportingTickTimeout = setTimeout(
+        () => {
+          // Track liveness
+          UtilitiesTracking.event(TrackingEventName.AppHeartbeat);
+        },
+
+        initial === true ? HEARTBEAT_REPORTING_TICK_INITIAL_DELAY : 0
+      );
+    },
+
+    setupHeartbeatReporting(): void {
+      if (this.heartbeatReportingInterval === null) {
+        // Tick a initial heartbeat reporting
+        this.tickHeartbeatReporting(true);
+
+        this.heartbeatReportingInterval = setInterval(() => {
+          // Tick a heartbeat reporting
+          this.tickHeartbeatReporting();
+        }, HEARTBEAT_REPORTING_INTERVAL);
+      }
+    },
+
+    unsetupHeartbeatReporting(): void {
+      // Clear interval reporter
+      if (this.heartbeatReportingInterval !== null) {
+        clearInterval(this.heartbeatReportingInterval);
+
+        this.heartbeatReportingInterval = null;
+      }
+
+      // Clear any scheduled report (from tick)
+      if (this.heartbeatReportingTickTimeout !== null) {
+        clearTimeout(this.heartbeatReportingTickTimeout);
+
+        this.heartbeatReportingTickTimeout = null;
+      }
+    }
+  }
 };
 </script>
 
