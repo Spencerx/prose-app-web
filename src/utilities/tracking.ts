@@ -122,9 +122,6 @@ class UtilitiesTracking {
         throw new Error("Tracking disabled by override");
       }
 
-      // TODO
-      console.error("==> CONFIG.overrides", CONFIG.overrides);
-
       // Acquire current time and next send time
       const nowTime = Date.now();
 
@@ -187,8 +184,10 @@ class UtilitiesTracking {
   }
 
   private __prepareEventOriginApp(): TrackingEventOriginApp {
+    // Acquire app name from package name, which might be namespaced, eg. \
+    //   '@namespace/project-name', or directly named eg. 'project-name'.
     return Object.freeze({
-      name: projectPackage.name,
+      name: projectPackage.name.split("/")[1] || projectPackage.name,
       version: projectPackage.version,
       platform: runtimePlatform
     });
