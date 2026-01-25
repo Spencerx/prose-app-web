@@ -10,6 +10,11 @@ Copyright 2025, Prose Foundation - Released under the [Mozilla Public License 2.
 
 _Tested at NodeJS version: `v20.18.2`_
 
+## Quick Links
+
+* ⬇️ **Download Prose apps**: [prose.org/downloads](https://prose.org/downloads/)
+* 💬 **Official XMPP chatroom**: [#general (click to join via Prose)](xmpp:org.prose.channel.5n6mqquv@groups.prose.org?join)
+
 ## Quick Setup
 
 ### Docker image
@@ -168,12 +173,6 @@ npm run bundle build -- --runner cargo-xwin --target x86_64-pc-windows-msvc
 ![Prose login screen](https://github.com/prose-im/prose-app-web/assets/1451907/92af0399-b74a-4321-b66a-a9a64d56b783)
 
 _👉 The Prose Web app reference design [can be found there](https://github.com/prose-im/prose-medley/blob/master/designs/app/prose-app-web.sketch)._
-
-## Updates
-
-As Prose is still being developed, update videos can be found on the Prose blog, month by month:
-
-- 🎥 [Prose Development Update: November 2023](https://prose.org/blog/prose-development-update-november-2023/)
 
 ## License
 
