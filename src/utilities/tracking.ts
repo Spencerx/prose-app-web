@@ -144,7 +144,7 @@ class UtilitiesTracking {
       // Important: if the user has opted-out of anonymous analytics, then do \
       //   not post ANY event to this endpoint (honor user choices).
       const trackingResponse = await fetch(
-        `${CONFIG.url.proseWeb}/_api/cloud/v1/track/event`,
+        `${CONFIG.url.proseWeb}/_api/cloud/v1/analytics/event`,
         {
           method: "POST",
           headers: {
