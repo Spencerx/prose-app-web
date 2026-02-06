@@ -176,7 +176,9 @@ class UtilitiesTracking {
 
     // Anonymize self JID
     const domainHash = this.__anonymizeUserIdentifier(selfJID.domain),
-      userHash = this.__anonymizeUserIdentifier(selfJID.node);
+      // NOTE: Use full JID as user identifier so it contains a random part
+      //   (prevents re-identification).
+      userHash = this.__anonymizeUserIdentifier(selfJID.toString());
 
     // Do we have sufficient information on the current user? Generate origin
     if (domainHash !== undefined && userHash !== undefined) {
