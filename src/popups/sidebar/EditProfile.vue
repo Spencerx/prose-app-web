@@ -90,9 +90,9 @@ import { SaveAvatarRequest } from "@/broker/modules/profile";
 
 // PROJECT: UTILITIES
 import {
-  default as UtilitiesTracking,
-  TrackingEventName
-} from "@/utilities/tracking";
+  default as UtilitiesAnalytics,
+  AnalyticsEventName
+} from "@/utilities/analytics";
 
 // TYPES
 type FormValueString = { inner: string };
@@ -383,8 +383,8 @@ export default {
       if (this.fetching !== true && this.saving !== true) {
         this.saving = true;
 
-        // Track action
-        UtilitiesTracking.event(TrackingEventName.ProfileUpdate);
+        // Record action
+        UtilitiesAnalytics.event(AnalyticsEventName.ProfileUpdate);
 
         // Apply forms in store
         this.formsToStoreApply(this.contentSections.profile.properties.form);
