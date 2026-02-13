@@ -37,9 +37,9 @@ import AppSidebar from "@/assemblies/app/AppSidebar.vue";
 
 // PROJECT: UTILITIES
 import {
-  default as UtilitiesTracking,
-  TrackingEventName
-} from "@/utilities/tracking";
+  default as UtilitiesAnalytics,
+  AnalyticsEventName
+} from "@/utilities/analytics";
 
 // CONSTANTS
 const HEARTBEAT_REPORTING_TICK_INITIAL_DELAY = 30000; // 30 seconds
@@ -93,8 +93,8 @@ export default {
       //   the final work.
       this.heartbeatReportingTickTimeout = setWorkerTimeout(
         () => {
-          // Track liveness
-          UtilitiesTracking.event(TrackingEventName.AppHeartbeat);
+          // Record liveness
+          UtilitiesAnalytics.event(AnalyticsEventName.AppHeartbeat);
         },
 
         initial === true ? HEARTBEAT_REPORTING_TICK_INITIAL_DELAY : 0

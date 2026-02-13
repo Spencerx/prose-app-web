@@ -3,7 +3,7 @@
 
   "overrides": {
     "allowInsecure": true,
-    "disableTracking": true,
+    "disableAnalytics": true,
 
     "hostMeta": {
       "prose.org.local": {

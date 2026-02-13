@@ -159,9 +159,9 @@ import { useEvents } from "@/composables/events";
 
 // PROJECT: UTILITIES
 import {
-  default as UtilitiesTracking,
-  TrackingEventName
-} from "@/utilities/tracking";
+  default as UtilitiesAnalytics,
+  AnalyticsEventName
+} from "@/utilities/analytics";
 
 // PROJECT: BROKER
 import Broker from "@/broker";
@@ -771,8 +771,8 @@ export default {
     async onModalSignOutProceed(
       options: SignOutEventProceedOptions
     ): Promise<void> {
-      // Track action
-      UtilitiesTracking.event(TrackingEventName.AccountSignout);
+      // Record action
+      UtilitiesAnalytics.event(AnalyticsEventName.AccountSignout);
 
       // Logout from account
       await Store.$account.logout(options.purge);

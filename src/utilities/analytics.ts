@@ -28,7 +28,7 @@ import CONFIG from "@/commons/config";
  * ENUMERATIONS
  * ************************************************************************* */
 
-export enum TrackingEventName {
+export enum AnalyticsEventName {
   // App Heartbeat.
   AppHeartbeat = "app:heartbeat",
   // Account Signin.
@@ -43,24 +43,24 @@ export enum TrackingEventName {
  * INTERFACES
  * ************************************************************************* */
 
-interface TrackingEventPayload {
-  name: TrackingEventName;
+interface AnalyticsEventPayload {
+  name: AnalyticsEventName;
   data?: object;
-  origin: TrackingEventOrigin;
+  origin: AnalyticsEventOrigin;
 }
 
-interface TrackingEventOrigin {
-  app: TrackingEventOriginApp;
-  pod: TrackingEventOriginPod;
+interface AnalyticsEventOrigin {
+  app: AnalyticsEventOriginApp;
+  pod: AnalyticsEventOriginPod;
 }
 
-interface TrackingEventOriginApp {
+interface AnalyticsEventOriginApp {
   name: string;
   version: string;
   platform: string;
 }
 
-interface TrackingEventOriginPod {
+interface AnalyticsEventOriginPod {
   domain_hash: string;
   user_hash?: string;
 }
@@ -74,11 +74,11 @@ const EVENT_NAME_NEXT_SEND_DELAY = 3000; // 3 seconds
 const ANONYMIZED_USER_IDENTIFIER_SHORT_LENGTH = 16; // 16 characters
 
 /**************************************************************************
- * TRACKING
+ * ANALYTICS
  * ************************************************************************* */
 
-class UtilitiesTracking {
-  private readonly __eventOriginApp: TrackingEventOriginApp;
+class UtilitiesAnalytics {
+  private readonly __eventOriginApp: AnalyticsEventOriginApp;
 
   private __eventsNextAllowedSendRegister: { [name: string]: number };
 
@@ -90,28 +90,28 @@ class UtilitiesTracking {
     this.__eventsNextAllowedSendRegister = {};
   }
 
-  event(name: TrackingEventName, data?: object): void {
-    // User did not opt-out of tracking reports? Dispatch event.
+  event(name: AnalyticsEventName, data?: object): void {
+    // User did not opt-out of analytics? Dispatch event.
     if (Store.$settings.privacy.report.tracking !== false) {
       // Notice: do not await here, since the 'event()' helper wraps \
       //   asynchronous code in synchronous-looking code. We should never wait \
-      //   for a tracking event dispatch to be complete (it is pointless). We \
+      //   for an analytics event dispatch to be complete (it is pointless). We \
       //   therefore avoid developer mistakes by marking this method as \
       //   synchronous, since developers will not await it by mistake in \
       //   caller code.
       this.__dispatchEvent(name, data);
     } else {
-      logger.debug(`Skipped sending tracking event: '${name}' (opted out)`);
+      logger.debug(`Skipped sending analytics event: '${name}' (opted out)`);
     }
   }
 
   private async __dispatchEvent(
-    name: TrackingEventName,
+    name: AnalyticsEventName,
     data?: object
   ): Promise<void> {
     try {
       // Generate event data
-      const eventData: TrackingEventPayload = {
+      const eventData: AnalyticsEventPayload = {
         name,
 
         origin: this.__makeEventOrigin()
@@ -121,11 +121,11 @@ class UtilitiesTracking {
         eventData.data = data;
       }
 
-      logger.debug(`Sending tracking event: '${name}'...`, eventData);
+      logger.debug(`Sending analytics event: '${name}'...`, eventData);
 
-      // Tracking is disabled by override?
-      if (CONFIG.overrides?.disableTracking === true) {
-        throw new Error("Tracking disabled by override");
+      // Analytics are disabled by override?
+      if (CONFIG.overrides?.disableAnalytics === true) {
+        throw new Error("Analytics disabled by override");
       }
 
       // Acquire current time and next send time
@@ -140,11 +140,11 @@ class UtilitiesTracking {
       this.__eventsNextAllowedSendRegister[name] =
         nowTime + EVENT_NAME_NEXT_SEND_DELAY;
 
-      // Send anonymized event to tracking endpoint
+      // Send anonymized event to analytics endpoint
       // Important: if the user has opted-out of anonymous analytics, then do \
       //   not post ANY event to this endpoint (honor user choices).
-      const trackingResponse = await fetch(
-        `${CONFIG.url.proseWeb}/_api/cloud/v1/track/event`,
+      const analyticsResponse = await fetch(
+        `${CONFIG.url.proseWeb}/_api/cloud/v1/analytics/event`,
         {
           method: "POST",
           headers: {
@@ -157,26 +157,28 @@ class UtilitiesTracking {
         }
       );
 
-      if (trackingResponse.ok !== true) {
-        throw new Error("Tracking request failed");
+      if (analyticsResponse.ok !== true) {
+        throw new Error("Analytics request failed");
       }
 
-      logger.info(`Sent tracking event: '${name}'`);
+      logger.info(`Sent analytics event: '${name}'`);
     } catch (error) {
       logger.info(
-        `Could not track event: '${name}'`,
+        `Could not record analytics event: '${name}'`,
         (error as Error)?.message || error
       );
     }
   }
 
-  private __makeEventOrigin(): TrackingEventOrigin {
+  private __makeEventOrigin(): AnalyticsEventOrigin {
     // Acquire self JID
     const selfJID = Store.$account.getSelfJID();
 
     // Anonymize self JID
     const domainHash = this.__anonymizeUserIdentifier(selfJID.domain),
-      userHash = this.__anonymizeUserIdentifier(selfJID.node);
+      // NOTE: Use full JID as user identifier so it contains a random part
+      //   (prevents re-identification).
+      userHash = this.__anonymizeUserIdentifier(selfJID.toString());
 
     // Do we have sufficient information on the current user? Generate origin
     if (domainHash !== undefined && userHash !== undefined) {
@@ -193,7 +195,7 @@ class UtilitiesTracking {
     throw new Error("Incomplete origin data");
   }
 
-  private __prepareEventOriginApp(): TrackingEventOriginApp {
+  private __prepareEventOriginApp(): AnalyticsEventOriginApp {
     // Acquire app name from package name, which might be namespaced, eg. \
     //   '@namespace/project-name', or directly named eg. 'project-name'.
     return Object.freeze({
@@ -220,4 +222,4 @@ class UtilitiesTracking {
  * EXPORTS
  * ************************************************************************* */
 
-export default new UtilitiesTracking();
+export default new UtilitiesAnalytics();
