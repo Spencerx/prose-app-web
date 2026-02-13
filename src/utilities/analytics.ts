@@ -175,9 +175,9 @@ class UtilitiesAnalytics {
     const selfJID = Store.$account.getSelfJID();
 
     // Anonymize self JID
+    // Notice: use full JID as user identifier so it contains a random part
+    //   (prevents re-identification).
     const domainHash = this.__anonymizeUserIdentifier(selfJID.domain),
-      // NOTE: Use full JID as user identifier so it contains a random part
-      //   (prevents re-identification).
       userHash = this.__anonymizeUserIdentifier(selfJID.toString());
 
     // Do we have sufficient information on the current user? Generate origin
